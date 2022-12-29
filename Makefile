@@ -1194,3 +1194,16 @@ dronegen:
 .PHONY: backport
 backport:
 	(cd ./assets/backport && go run main.go -pr=$(PR) -to=$(TO))
+
+
+# Flakebot will upload all test artifacts in $TEST_LOG_DIR to flakebot.com
+.PHONY: flakebot
+flakebot:
+	for file in $(TEST_LOG_DIR)/*.json; do \
+		gotestsum --junitfile $$file.xml --raw-command cat $$file; \
+	done
+
+	mkdir -p ./build.assets/tooling/bin
+	curl -fsSL https://get.flakebot.com/reporter/latest/$(OS)-$(ARCH) > build.assets/tooling/bin/reporter
+	chmod +x ./build.assets/tooling/bin/reporter
+	./build.assets/tooling/bin/reporter $(TEST_LOG_DIR)

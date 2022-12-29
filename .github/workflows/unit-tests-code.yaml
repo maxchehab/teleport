@@ -57,3 +57,9 @@ jobs:
       - name: Run tests
         timeout-minutes: 40
         run: make test-go test-sh test-api
+
+      - name: Upload test artifacts to Flakebot 🤖
+        if: '!cancelled()' # run even if previous steps fail
+        run: make flakebot
+        env:
+          FLAKEBOT_REPORTER_KEY: ${{ secrets.FLAKEBOT_REPORTER_KEY }}
